@@ -1,0 +1,253 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String
+  email     String    @unique
+  password  String
+  role      Role      @default(OWNER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  
+  schoolId  Int?
+  school    School?   @relation(fields: [schoolId], references: [id])
+
+  teacher   Teacher?
+  parent    Parent?
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  STAFF
+  TEACHER
+  PARENT
+  STUDENT
+}
+
+// School
+model School {
+  id        Int       @id @default(autoincrement())
+  name      String
+  address   String
+  contact   String
+  createdAt DateTime  @default(now())
+
+
+  classes   Class[]
+  employees Teacher[]
+  students  Student[]
+  parents   Parent[]
+  users     User[]
+  schoolSettings SchoolSetting?
+}
+
+// Class with class teacher
+model Class {
+  id             Int       @id @default(autoincrement())
+  name           String
+  section        String?
+  schoolId       Int
+  school         School    @relation(fields: [schoolId], references: [id])
+
+  classTeacherId Int?
+  classTeacher   Teacher?  @relation("ClassTeacher", fields: [classTeacherId], references: [id])
+
+  subjects       Subject[]
+  students       Student[]
+  timetable      TimeTable[]
+  exams          Exam[]
+}
+
+// Subjects
+model Subject {
+  id          Int     @id @default(autoincrement())
+  name        String
+  code        String?
+  classId     Int
+  class       Class   @relation(fields: [classId], references: [id])
+
+  // Marks configuration
+  maxMarks    Int     @default(100)
+  passingMarks Int    @default(40)
+
+  examResults ExamResult[]
+  timetable   TimeTable[]
+}
+
+// Student
+model Student {
+  id        Int      @id @default(autoincrement())
+  name      String
+  dob       DateTime
+  rollNo    String   @unique
+  gender    String
+  classId   Int
+  class     Class    @relation(fields: [classId], references: [id])
+
+  parentId  Int?
+  parent    Parent?  @relation(fields: [parentId], references: [id])
+
+  schoolId  Int
+  school    School?  @relation(fields: [schoolId], references: [id])
+
+  fees      Fee[]
+  attendance Attendance[]
+  exams     ExamResult[]
+}
+
+// Parent
+model Parent {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+  phone     String
+  address   String
+
+  
+  schoolId  Int
+  school    School?  @relation(fields: [schoolId], references: [id])
+
+  students  Student[]
+}
+
+// Teacher
+model Teacher {
+  id        Int      @id @default(autoincrement())
+  userId    Int     @unique
+  user      User     @relation(fields: [userId], references: [id])
+  schoolId  Int
+  school    School   @relation(fields: [schoolId], references: [id])
+
+  subject   String?
+  salary    Salary[]
+  attendance Attendance[]
+
+  classTeacherOf Class[] @relation("ClassTeacher")
+}
+
+// Fees
+model Fee {
+  id         Int      @id @default(autoincrement())
+  studentId  Int
+  student    Student  @relation(fields: [studentId], references: [id])
+  amount     Float
+  status     FeeStatus @default(PENDING)
+  dueDate    DateTime
+  paidAt     DateTime?
+}
+
+enum FeeStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+// Salaries
+model Salary {
+  id        Int      @id @default(autoincrement())
+  teacherId Int
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  amount    Float
+  month     String
+  status    SalaryStatus @default(UNPAID)
+  paidAt    DateTime?
+}
+
+enum SalaryStatus {
+  UNPAID
+  PAID
+}
+
+// Attendance
+model Attendance {
+  id        Int       @id @default(autoincrement())
+  date      DateTime
+  status    AttendanceStatus
+
+  studentId Int?
+  student   Student?  @relation(fields: [studentId], references: [id])
+
+  teacherId Int?
+  teacher   Teacher?  @relation(fields: [teacherId], references: [id])
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LEAVE
+}
+
+// Time Table
+model TimeTable {
+  id        Int       @id @default(autoincrement())
+  day       String
+  period    Int
+  subjectId Int
+  subject   Subject   @relation(fields: [subjectId], references: [id])
+  classId   Int
+  class     Class     @relation(fields: [classId], references: [id])
+}
+
+// Exams
+model Exam {
+  id        Int       @id @default(autoincrement())
+  name      String
+  date      DateTime
+  classId   Int
+  class     Class     @relation(fields: [classId], references: [id])
+
+  results   ExamResult[]
+}
+
+model ExamResult {
+  id        Int       @id @default(autoincrement())
+  examId    Int
+  exam      Exam      @relation(fields: [examId], references: [id])
+
+  studentId Int
+  student   Student   @relation(fields: [studentId], references: [id])
+
+  subjectId Int
+  subject   Subject   @relation(fields: [subjectId], references: [id])
+
+  marks     Float
+  grade     String
+}
+
+// School-wide academic settings
+model SchoolSetting {
+  id          Int      @id @default(autoincrement())
+  schoolId    Int      @unique
+  school      School   @relation(fields: [schoolId], references: [id])
+
+  passingMarks Int     @default(40)
+
+  gradingScale GradingScale[]
+}
+
+// Define grading scales (A, B, C, etc.)
+model GradingScale {
+  id            Int           @id @default(autoincrement())
+  schoolSettingId Int
+  schoolSetting  SchoolSetting @relation(fields: [schoolSettingId], references: [id])
+
+  grade         String   // e.g. "A+", "A", "B"
+  minPercentage Float    // e.g. 85
+  maxPercentage Float    // e.g. 100
+}
