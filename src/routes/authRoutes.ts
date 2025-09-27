@@ -4,8 +4,8 @@ import AuthMiddleware from '../middlewares/authMiddleware';
 
 const router = Router();
 
-router.post('/auth/register', AuthController.signup);
-router.post('/auth/login', AuthController.login);
+router.post('/register', AuthController.signup);
+router.post('/login', AuthController.login);
 router.get(
   '/user/:id',
   AuthMiddleware.authenticate,

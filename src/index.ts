@@ -3,6 +3,9 @@ import cors from 'cors';
 import express, { Request, Response } from 'express';
 import AuthRouter from './routes/authRoutes';
 import SchoolRouter from './routes/schoolRoutes';
+import ClassRouter from './routes/classRoutes';
+import EmployeeRouter from './routes/employeeRoutes';
+import morgan from 'morgan';
 
 dotenv.config();
 
@@ -13,9 +16,15 @@ app.use(
   })
 );
 
+app.use(morgan('tiny'));
+
 app.use(express.json());
-app.use('/api', AuthRouter);
-app.use('/api', SchoolRouter);
+app.use('/api/auth', AuthRouter);
+app.use('/api/school', SchoolRouter);
+app.use('/api/class', ClassRouter);
+app.use('/api/employee', EmployeeRouter);
+
+
 const port = process.env.PORT || 3000;
 const host = process.env.HOST;
 

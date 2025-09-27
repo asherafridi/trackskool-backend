@@ -8,7 +8,7 @@ class schoolController {
             const schoolId = req.user.schoolId;
             if (!schoolId) return res.status(400).json({ message: 'Access Denied' });
             const school = await SchoolService.getSchool(schoolId);
-            return res.status(201).json(school);
+            return res.status(200).json(school);
         } catch (error) {
             res.status(400).json({ message: 'Registration failed', error });
         }
@@ -45,7 +45,7 @@ class schoolController {
             const schoolId = req.user.schoolId;
             if (!schoolId) return res.status(400).json({ message: 'Access Denied' });
             const settings = await SchoolService.getSchoolSettings(schoolId);
-            return res.status(201).json(settings);
+            return res.status(200).json(settings);
         } catch (error) {
             res.status(400).json({ message: 'Registration failed', error });
         }
@@ -55,7 +55,7 @@ class schoolController {
             const schoolId = req.user.schoolId;
             if (!schoolId) return res.status(400).json({ message: 'Access Denied' });
             const users = await SchoolService.getSchoolUser(schoolId);
-            return res.status(201).json(users);
+            return res.status(200).json(users);
         } catch (error) {
             res.status(400).json({ message: 'Registration failed', error });
         }

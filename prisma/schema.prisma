@@ -27,7 +27,7 @@ model User {
   schoolId  Int?
   school    School?   @relation(fields: [schoolId], references: [id])
 
-  teacher   Teacher?
+  employee   Employee?
   parent    Parent?
 }
 
@@ -50,7 +50,7 @@ model School {
 
 
   classes   Class[]
-  employees Teacher[]
+  employees Employee[]
   students  Student[]
   parents   Parent[]
   users     User[]
@@ -61,12 +61,11 @@ model School {
 model Class {
   id             Int       @id @default(autoincrement())
   name           String
-  section        String?
   schoolId       Int
   school         School    @relation(fields: [schoolId], references: [id])
 
   classTeacherId Int?
-  classTeacher   Teacher?  @relation("ClassTeacher", fields: [classTeacherId], references: [id])
+  classTeacher   Employee?  @relation("ClassTeacher", fields: [classTeacherId], references: [id])
 
   subjects       Subject[]
   students       Student[]
@@ -127,14 +126,30 @@ model Parent {
 }
 
 // Teacher
-model Teacher {
+model Employee {
   id        Int      @id @default(autoincrement())
-  userId    Int     @unique
-  user      User     @relation(fields: [userId], references: [id])
+  userId    Int?     @unique
+  user      User?     @relation(fields: [userId], references: [id])
   schoolId  Int
   school    School   @relation(fields: [schoolId], references: [id])
 
-  subject   String?
+  name      String
+  picture   String?
+  mobile    String
+  dateOfJoining DateTime
+  monthlySalary Float
+  role      Role     @default(TEACHER)
+
+  guardianName String?
+  gender    String?
+  experience String?
+  nationalId  String?
+  religion   String?
+  education String?
+  bloodGroup String?
+  dateofBirth DateTime?
+  address   String?
+  
   salary    Salary[]
   attendance Attendance[]
 
@@ -161,8 +176,8 @@ enum FeeStatus {
 // Salaries
 model Salary {
   id        Int      @id @default(autoincrement())
-  teacherId Int
-  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  employeeId Int?
+  employee   Employee?  @relation(fields: [employeeId], references: [id])
   amount    Float
   month     String
   status    SalaryStatus @default(UNPAID)
@@ -183,8 +198,8 @@ model Attendance {
   studentId Int?
   student   Student?  @relation(fields: [studentId], references: [id])
 
-  teacherId Int?
-  teacher   Teacher?  @relation(fields: [teacherId], references: [id])
+  employeeId Int?
+  employee   Employee?  @relation(fields: [employeeId], references: [id])
 }
 
 enum AttendanceStatus {

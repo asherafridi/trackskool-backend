@@ -5,13 +5,13 @@ import SchoolController from '../controllers/schoolController';
 
 const router = Router();
 
-router.get('/school',AuthMiddleware.authenticate, SchoolController.getSchool);
-router.post('/school',AuthMiddleware.authenticate, SchoolController.updateSchool);
+router.get('/',AuthMiddleware.authenticate, SchoolController.getSchool);
+router.post('/',AuthMiddleware.authenticate, SchoolController.updateSchool);
 
-router.post('/school/settings',AuthMiddleware.authenticate, SchoolController.upsertSchoolSettings);
-router.get('/school/settings',AuthMiddleware.authenticate, SchoolController.getSchoolSettings);
+router.post('/settings',AuthMiddleware.authenticate, SchoolController.upsertSchoolSettings);
+router.get('/settings',AuthMiddleware.authenticate, SchoolController.getSchoolSettings);
 
-router.get('/school/users',AuthMiddleware.authenticate, SchoolController.getSchoolUsers);
+router.get('/users',AuthMiddleware.authenticate, SchoolController.getSchoolUsers);
 
 
 export default router;
