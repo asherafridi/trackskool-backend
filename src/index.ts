@@ -5,6 +5,7 @@ import AuthRouter from './routes/authRoutes';
 import SchoolRouter from './routes/schoolRoutes';
 import ClassRouter from './routes/classRoutes';
 import EmployeeRouter from './routes/employeeRoutes';
+import subjectRouter from './routes/subjectRoutes';
 import morgan from 'morgan';
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use('/api/auth', AuthRouter);
 app.use('/api/school', SchoolRouter);
 app.use('/api/class', ClassRouter);
 app.use('/api/employee', EmployeeRouter);
+app.use('/api/subject', subjectRouter)
 
 
 const port = process.env.PORT || 3000;

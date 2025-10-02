@@ -12,6 +12,6 @@ router.patch('/:id',AuthMiddleware.authenticate, ClassController.updateClass);
 
 router.delete('/:id',AuthMiddleware.authenticate, ClassController.deleteClass);
 
-
+//asdasd
 
 export default router;
